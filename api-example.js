@@ -16,7 +16,8 @@
 // * this resolves performance issues by binding functionality directly to POJOs
 // * we can still produce an actions list, as we know the names and domains of functions
 //    and their data, and model-store wraps them internally
-// * the API familiar as it's based on Redux's best bits, but aims to solve painpoints
+// * the API is familiar as it's based on Redux's best bits, but aims to solve painpoints
+// * stacktraces become useful!
 
 // An example of the react connection function
 // 1: map the current state of the application as a POJO
@@ -37,9 +38,9 @@ const LogoutComponent = ({ userId, logout }) => {
       <div>
         Signed in as {userId}
       </div>
-      <MyButton onClick={logout}>
+      <button onClick={logout}>
         Logout
-      </MyButton>
+      </button>
     </div>
   )
 }
