@@ -2,6 +2,9 @@
 // * dispatching actions only helps if it's committed to 100%, (time-travel, debugging actions list)
 //    but many developers disagree with decoupling their code so much, 
 //    and it's hard to explain the real benefits
+// * action creators and actions and action-type constants and reducers and thunks and epics... it's complicated
+// * actions are meant to be like events, but with middlewares they start to become "come-from" statements 
+//    where anything can do work at any time and debugging becomes difficult
 // * as applications grow the number of reducers and middlewares starts to be a performance drag
 // * debugging can be hard as stacktraces don't link back to their originating component or function call
 // * side effects require middlewares, which often add extra APIs to remember
@@ -16,8 +19,8 @@
 // * the API familiar as it's based on Redux's best bits, but aims to solve painpoints
 
 // An example of the react connection function
-// 1: just the current state of the application as a POJO
-// 2: a function creator which maps domain functions, and lets you construct clojure functions with state
+// 1: map the current state of the application as a POJO
+// 2: map domain functions, and let construct clojure functions with state
 connect(
   state => ({
     userId: state.auth.userId
@@ -41,7 +44,6 @@ const LogoutComponent = ({ userId, logout }) => {
   )
 }
 
-
 // An example of configuring the store
 const domains = {
   auth: configureDomain(
@@ -57,14 +59,14 @@ const domains = {
 }
 const store = configureStore(domains)
 
-// Functions are provided as standard JS functions, with a paired error handler
-//  and are wrapped by model-store to provide failure safety and access to the store.
-// setState calls are tracked in the actions timeline, as well as calls to these functions,
-//  and follow functional principles of immutability
-// the store given is always the entire store, since we don't want to artificially 
-//  create pain running cross-domain functions
-// setState returns a promise meaning it will propagate immediately, and 
-//  your functions can update the UI during their process
+// * Functions are provided as standard JS functions, with a paired error handler
+//    and are wrapped by model-store to provide failure safety and access to the store.
+// * setState calls are tracked in the actions timeline, as well as calls to these functions,
+//    and follow functional principles of immutability
+// * the store given is always the entire store, since we don't want to artificially 
+//    create pain running cross-domain functions
+// * setState returns a promise meaning it will propagate immediately, and 
+//    your functions can update the UI during their process
 const createAuthFunctions = (store) => ({
   logout: createFunction(
 
