@@ -21,7 +21,7 @@ export function createModel(domains) {
   return {
     store,
     functions,
-    addEventListener: events.addListener
+    addEventListener: events.addListener.bind(events)
   }
 }
 
