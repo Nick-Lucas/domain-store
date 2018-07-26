@@ -8,7 +8,7 @@ const webpack = require('webpack')
 const webpackStream = require('webpack-stream')
 
 const Instrumenter = isparta.Instrumenter
-const mochaGlobals = require('./test/setup/.globals')
+const mochaGlobals = require('./.globals')
 const manifest = require('./package.json')
 
 // Load all of our Gulp plugins
@@ -84,7 +84,7 @@ function build() {
 
 function _mocha() {
   return gulp
-    .src(['test/setup/node.js', 'test/unit/**/*.js'], { read: false })
+    .src(['test/setup/node.js', 'src/**/*.test.js'], { read: false })
     .pipe(
       $.mocha({
         reporter: 'dot',
@@ -132,7 +132,7 @@ function testBrowser() {
   // Our testing bundle is made up of our unit tests, which
   // should individually load up pieces of our application.
   // We also include the browser setup file.
-  const testFiles = glob.sync('./test/unit/**/*.js')
+  const testFiles = glob.sync('./src/**/*.test.js')
   const allFiles = ['./test/setup/browser.js'].concat(testFiles)
 
   // Lets us differentiate between the first build and subsequent builds
