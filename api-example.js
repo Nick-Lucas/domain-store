@@ -69,31 +69,22 @@ const store = configureStore(domains)
 // * setState returns a promise meaning it will propagate immediately, and 
 //    your functions can update the UI during their process
 const createAuthFunctions = (store) => ({
-  logout: createFunction(
+  logout: async () => {
+    await store.setState({ auth: { status: 'logout_in_progress' } })
 
-    // Main function body
-    async () => {
-      await store.setState({ auth: { status: 'logout_in_progress' } })
+    const authToken = store.getState().authToken
 
-      const authToken = store.getState().authToken
-  
-      const response = logoutApiCall(authToken)
-      if (response.code !== 200) {
-        throw "Non-200 Status: " + response.status
-      }
-  
-      await store.setState({ 
-        auth: { 
-          status: 'logout_success', 
-          authToken: '' 
-        } 
-      })
-    },
-
-    // Error handler
-    async e => {
+    const response = logoutApiCall(authToken)
+    if (response.code !== 200) {
       await store.setState({ auth: { status: 'logout_failure' } })
     }
 
-  )
+    await store.setState({ 
+      auth: { 
+        status: 'logout_success', 
+        authToken: '' 
+      } 
+    })
+  },
+  // login: ...etc
 })
