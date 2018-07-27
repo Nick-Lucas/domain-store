@@ -3,14 +3,7 @@ import EventsLog from './events-log'
 // takes a domain id
 // takes an initial state for the domain
 // takes a function which given a store will return an object of functions
-export function createDomain(
-  id = '',
-  initialState = {},
-  functionsCreator = () => ({})
-) {
-  if (typeof id !== 'string') {
-    throw 'id must be a string'
-  }
+export function createDomain(initialState = {}, functionsCreator = () => ({})) {
   if (typeof initialState !== 'object') {
     throw 'initialState must be an object'
   }
@@ -18,25 +11,8 @@ export function createDomain(
     throw 'functionsCreator must be a function'
   }
   return {
-    id,
     initialState,
     functionsCreator
-  }
-}
-
-// use this in the functionsCreator
-// takes an id
-// takes a function
-export function createFunction(id = '', func) {
-  if (typeof id !== 'string') {
-    throw 'id must be a string'
-  }
-  if (typeof func !== 'function') {
-    throw 'func must be a function'
-  }
-  return {
-    id,
-    func
   }
 }
 
@@ -67,11 +43,7 @@ function buildStore(events, domainKeys, domains) {
           ...state[domainKey],
           ...updates[domainKey]
         }
-        events.trackUpdate(
-          domains[domainKey].id,
-          updates[domainKey],
-          state[domainKey]
-        )
+        events.trackUpdate(domainKey, updates[domainKey], state[domainKey])
       })
     }
   }
@@ -89,11 +61,11 @@ function buildFunctions(events, store, domainKeys, domains) {
     const functions = domains[domainKey].functionsCreator(store)
 
     Object.keys(functions).map(funcKey => {
-      const { id: funcId, func } = functions[funcKey]
+      const func = functions[funcKey]
 
       functions[funcKey] = (...args) => {
         const result = func(...args)
-        events.trackFunction(domains[domainKey].id, funcId, [...args], result)
+        events.trackFunction(domainKey, funcKey, [...args], result)
         return result
       }
     })

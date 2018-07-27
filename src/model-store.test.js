@@ -1,28 +1,28 @@
 'use strict'
 
-import { createModel, createDomain, createFunction } from './model-store'
+import { createModel, createDomain } from './model-store'
 
 describe('ModelStore', () => {
   let store, functions, addEventListener
 
   const setupModel = (initialState = { user: '123', token: 'abcdegf' }) => {
     const model = createModel({
-      auth: createDomain('auth', initialState, store => ({
-        login: createFunction('login', user => {
+      auth: createDomain(initialState, store => ({
+        login: user => {
           store.setState({
             auth: {
               user,
               token: 'qwertyuiop'
             }
           })
-        }),
-        isLoggedIn: createFunction('isLoggedIn', () => {
+        },
+        isLoggedIn: () => {
           const { token } = store.getState().auth
           if (token) {
             return true
           }
           return false
-        })
+        }
       }))
     })
     store = model.store
