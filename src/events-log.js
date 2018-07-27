@@ -20,10 +20,6 @@ export default class EventsLog {
   }
 
   trackFunction(domain, func, args, result) {
-    if (!Array.isArray(args) && Object.keys(args).length === 0) {
-      args = []
-    }
-
     const event = {
       type: 'function',
       domain,

@@ -1,28 +1,28 @@
 'use strict'
 
-import { createModel, createDomain } from './model-store'
+import { createModel, createDomain, createFunction } from './model-store'
 
 describe('ModelStore', () => {
   let store, functions, addEventListener
 
   const setupModel = (initialState = { user: '123', token: 'abcdegf' }) => {
     const model = createModel({
-      auth: createDomain(initialState, store => ({
-        login: user => {
+      auth: createDomain('auth', initialState, store => ({
+        login: createFunction('login', user => {
           store.setState({
             auth: {
               user,
               token: 'qwertyuiop'
             }
           })
-        },
-        isLoggedIn: () => {
+        }),
+        isLoggedIn: createFunction('isLoggedIn', () => {
           const { token } = store.getState().auth
           if (token) {
             return true
           }
           return false
-        }
+        })
       }))
     })
     store = model.store
@@ -48,7 +48,6 @@ describe('ModelStore', () => {
     })
 
     it('tracks an event for a function call with arguments', done => {
-      setupModel()
       const expectedEvents = [
         {
           type: 'function',
@@ -67,13 +66,14 @@ describe('ModelStore', () => {
       addEventListener(event => {
         const expectedEvent = expectedEvents.pop()
         expect(event).to.deep.equal(expectedEvent)
-        done()
+        if (!expectedEvents.length) {
+          done()
+        }
       })
       functions.auth.login('user_id')
     })
 
     it('tracks an event for a function call with return value', done => {
-      setupModel()
       addEventListener(event => {
         expect(event).to.deep.equal({
           type: 'function',
