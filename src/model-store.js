@@ -64,8 +64,9 @@ function buildFunctions(events, store, domainKeys, domains) {
       const func = functions[funcKey]
 
       functions[funcKey] = (...args) => {
+        events.trackFunctionStart(domainKey, funcKey, [...args])
         const result = func(...args)
-        events.trackFunction(domainKey, funcKey, [...args], result)
+        events.trackFunctionEnd(domainKey, funcKey, [...args], result)
         return result
       }
     })

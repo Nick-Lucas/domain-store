@@ -19,9 +19,20 @@ export default class EventsLog {
     this.listeners.forEach(listener => listener(event))
   }
 
-  trackFunction(domain, func, args, result) {
+  trackFunctionStart(domain, func, args) {
     const event = {
-      type: 'function',
+      type: 'function-start',
+      domain,
+      function: func,
+      args
+    }
+    this.log.push(event)
+    this.listeners.forEach(listener => listener(event))
+  }
+
+  trackFunctionEnd(domain, func, args, result) {
+    const event = {
+      type: 'function-end',
       domain,
       function: func,
       args,

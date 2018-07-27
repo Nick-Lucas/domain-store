@@ -50,7 +50,7 @@ describe('ModelStore', () => {
     it('tracks an event for a function call with arguments', done => {
       const expectedEvents = [
         {
-          type: 'function',
+          type: 'function-end',
           domain: 'auth',
           function: 'login',
           args: ['user_id'],
@@ -61,6 +61,12 @@ describe('ModelStore', () => {
           domain: 'auth',
           update: { user: 'user_id', token: 'qwertyuiop' },
           result: { user: 'user_id', token: 'qwertyuiop' }
+        },
+        {
+          type: 'function-start',
+          domain: 'auth',
+          function: 'login',
+          args: ['user_id']
         }
       ]
       addEventListener(event => {
@@ -74,15 +80,27 @@ describe('ModelStore', () => {
     })
 
     it('tracks an event for a function call with return value', done => {
-      addEventListener(event => {
-        expect(event).to.deep.equal({
-          type: 'function',
+      const expectedEvents = [
+        {
+          type: 'function-end',
           domain: 'auth',
           function: 'isLoggedIn',
           args: [],
           result: true
-        })
-        done()
+        },
+        {
+          type: 'function-start',
+          domain: 'auth',
+          function: 'isLoggedIn',
+          args: []
+        }
+      ]
+      addEventListener(event => {
+        const expectedEvent = expectedEvents.pop()
+        expect(event).to.deep.equal(expectedEvent)
+        if (!expectedEvents.length) {
+          done()
+        }
       })
       functions.auth.isLoggedIn()
     })
