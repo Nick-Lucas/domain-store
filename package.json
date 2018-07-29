@@ -2,7 +2,7 @@
   "name": "model-store",
   "version": "0.0.1",
   "description": "Domain based state store with side effects built in",
-  "main": "dist/model-store.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "gulp",
     "lint": "gulp lint",
@@ -56,7 +56,7 @@
     "webpack-stream": "3.2.0"
   },
   "babelBoilerplateOptions": {
-    "entryFileName": "model-store.js",
+    "entryFileName": "index.js",
     "mainVarName": "ModelStore"
   },
   "dependencies": {}
