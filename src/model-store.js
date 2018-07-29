@@ -58,7 +58,8 @@ const buildState = (domainKeys, domains) =>
 function buildFunctions(events, store, domainKeys, domains) {
   const domainFunctions = {}
   domainKeys.forEach(domainKey => {
-    const functions = domains[domainKey].functionsCreator(store)
+    const domainStore = createDomainStore(domainKey, store)
+    const functions = domains[domainKey].functionsCreator(domainStore)
 
     Object.keys(functions).map(funcKey => {
       const func = functions[funcKey]
@@ -74,4 +75,12 @@ function buildFunctions(events, store, domainKeys, domains) {
     domainFunctions[domainKey] = functions
   })
   return domainFunctions
+}
+
+// wraps a domain's store state in get/set state functionality
+function createDomainStore(domainKey, store) {
+  return {
+    getState: () => store.getState()[domainKey],
+    setState: state => store.setState({ [domainKey]: state })
+  }
 }

@@ -10,14 +10,12 @@ describe('ModelStore', () => {
       auth: createDomain(initialState, store => ({
         login: user => {
           store.setState({
-            auth: {
-              user,
-              token: 'qwertyuiop'
-            }
+            user,
+            token: 'qwertyuiop'
           })
         },
         isLoggedIn: () => {
-          const { token } = store.getState().auth
+          const { token } = store.getState()
           if (token) {
             return true
           }
