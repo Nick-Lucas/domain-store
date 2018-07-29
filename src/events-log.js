@@ -8,12 +8,12 @@ export default class EventsLog {
     this.listeners.push(callback)
   }
 
-  trackUpdate(domain, update, result) {
+  // TODO: record the diff here along with the new state
+  trackUpdate(domain, state) {
     const event = {
       type: 'update',
       domain,
-      update,
-      result
+      state
     }
     this.log.push(event)
     this.listeners.forEach(listener => listener(event))
@@ -30,13 +30,13 @@ export default class EventsLog {
     this.listeners.forEach(listener => listener(event))
   }
 
-  trackFunctionEnd(domain, func, args, result) {
+  trackFunctionEnd(domain, func, args, nextState) {
     const event = {
       type: 'function-end',
       domain,
       function: func,
       args,
-      result
+      nextState
     }
     this.log.push(event)
     this.listeners.forEach(listener => listener(event))

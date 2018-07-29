@@ -36,14 +36,14 @@ function buildStore(events, domainKeys, domains) {
   const state = buildState(domainKeys, domains)
   return {
     getState: () => state,
-    setState: updates => {
-      const domainKeys = Object.keys(updates)
+    setState: nextState => {
+      const domainKeys = Object.keys(nextState)
       domainKeys.forEach(domainKey => {
         state[domainKey] = {
           ...state[domainKey],
-          ...updates[domainKey]
+          ...nextState[domainKey]
         }
-        events.trackUpdate(domainKey, updates[domainKey], state[domainKey])
+        events.trackUpdate(domainKey, nextState[domainKey])
       })
     }
   }
@@ -65,10 +65,12 @@ function buildFunctions(events, store, domainKeys, domains) {
       const func = functions[funcKey]
 
       functions[funcKey] = (...args) => {
-        events.trackFunctionStart(domainKey, funcKey, [...args])
-        const result = func(...args)
-        events.trackFunctionEnd(domainKey, funcKey, [...args], result)
-        return result
+        events.trackFunctionStart(domainKey, funcKey, args)
+        const nextState = func(...args)
+        events.trackFunctionEnd(domainKey, funcKey, args, nextState)
+        if (nextState) {
+          store.setState({ [domainKey]: nextState })
+        }
       }
     })
 
@@ -77,10 +79,9 @@ function buildFunctions(events, store, domainKeys, domains) {
   return domainFunctions
 }
 
-// wraps a domain's store state in get/set state functionality
+// wraps a domain's store state in get state functionality
 function createDomainStore(domainKey, store) {
   return {
-    getState: () => store.getState()[domainKey],
-    setState: state => store.setState({ [domainKey]: state })
+    getState: () => store.getState()[domainKey]
   }
 }

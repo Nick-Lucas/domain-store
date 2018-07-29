@@ -12,14 +12,10 @@ describe('EventsLog', () => {
   })
 
   it('should track updates fine with no listeners attached', () => {
-    events.trackUpdate(
-      'TEST_DOMAIN',
-      { a: 1, b: 2 },
-      { a: 1, b: 2, c: 'hello' }
-    )
+    events.trackUpdate('TEST_DOMAIN', { a: 1, b: 2, c: 'hello' })
   })
 
-  it('should track a function in the queue', done => {
+  it('should track a function in the log', done => {
     events.addListener(event => {
       expect(event).to.deep.equal({
         type: 'function-start',
@@ -32,20 +28,15 @@ describe('EventsLog', () => {
     events.trackFunctionStart('TEST_DOMAIN', 'TEST_FUNC', ['args1', 'arg2'])
   })
 
-  it('should track a update in the queue', done => {
+  it('should track a update in the log', done => {
     events.addListener(event => {
       expect(event).to.deep.equal({
         type: 'update',
         domain: 'TEST_DOMAIN',
-        update: { a: 1, b: 2 },
-        result: { a: 1, b: 2, c: 'hello' }
+        state: { a: 1, b: 2, c: 'hello' }
       })
       done()
     })
-    events.trackUpdate(
-      'TEST_DOMAIN',
-      { a: 1, b: 2 },
-      { a: 1, b: 2, c: 'hello' }
-    )
+    events.trackUpdate('TEST_DOMAIN', { a: 1, b: 2, c: 'hello' })
   })
 })
