@@ -3,7 +3,7 @@ import EventsLog from './events-log'
 // takes a domain id
 // takes an initial state for the domain
 // takes a function which given a store will return an object of functions
-export function createDomain(initialState = {}, functionsCreator = () => ({})) {
+export function createDomain(initialState, functionsCreator) {
   if (typeof initialState !== 'object') {
     throw 'initialState must be an object'
   }
