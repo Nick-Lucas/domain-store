@@ -64,9 +64,9 @@ function buildFunctions(events, store, domainKeys, domains) {
     Object.keys(functions).map(funcKey => {
       const func = functions[funcKey]
 
-      functions[funcKey] = (...args) => {
+      functions[funcKey] = async (...args) => {
         events.trackFunctionStart(domainKey, funcKey, args)
-        const nextState = func(...args)
+        const nextState = await func(...args)
         events.trackFunctionEnd(domainKey, funcKey, args, nextState)
         if (nextState) {
           store.setState({ [domainKey]: nextState })

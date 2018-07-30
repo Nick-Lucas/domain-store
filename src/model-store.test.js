@@ -5,23 +5,36 @@ import { createModel, createDomain } from './model-store'
 describe('ModelStore', () => {
   let store, functions, addEventListener
 
-  const setupModel = (initialState = { user: '123', token: 'abcdegf' }) => {
+  const setupModel = () => {
     const model = createModel({
-      auth: createDomain(initialState, store => ({
+      auth: createDomain({ user: '123', token: 'abcdegf' }, store => ({
         login: user => {
           return {
             user,
             token: 'qwertyuiop'
           }
         },
-        logout: () => {
-          const state = store.getState()
-          if (state.token) {
-            return {
-              ...state,
-              token: ''
-            }
-          }
+        pingServer: () => {
+          return
+        }
+      }))
+    })
+    store = model.store
+    functions = model.functions
+    addEventListener = model.addEventListener
+  }
+
+  const setupAsyncModel = () => {
+    const model = createModel({
+      auth: createDomain({ user: '123', token: 'abcdegf' }, store => ({
+        login: async user => {
+          return await Promise.resolve({
+            user,
+            token: 'qwertyuiop'
+          })
+        },
+        pingServer: async () => {
+          await Promise.resolve()
         }
       }))
     })
@@ -39,52 +52,69 @@ describe('ModelStore', () => {
     addEventListener = model.addEventListener
   }
 
-  describe('synchronous functions', () => {
-    beforeEach(() => {
-      setupModel()
-    })
+  describe('functions', () => {
+    const types = [
+      { name: 'synchronous functions', setup: setupModel },
+      { name: 'asynchronous functions', setup: setupModel }
+    ]
 
-    it('updates the store', () => {
-      functions.auth.login('user_id')
-      expect(store.getState().auth).to.deep.equal({
-        user: 'user_id',
-        token: 'qwertyuiop'
-      })
-    })
+    types.forEach(({ name, setup }) => {
+      describe(name, () => {
+        beforeEach(() => {
+          setup()
+        })
 
-    it('tracks an event for a function call with arguments', done => {
-      const expectedEvents = [
-        {
-          type: 'update',
-          domain: 'auth',
-          state: { user: 'user_id', token: 'qwertyuiop' }
-        },
-        {
-          type: 'function-end',
-          domain: 'auth',
-          function: 'login',
-          args: ['user_id'],
-          nextState: { user: 'user_id', token: 'qwertyuiop' }
-        },
-        {
-          type: 'function-start',
-          domain: 'auth',
-          function: 'login',
-          args: ['user_id']
-        }
-      ]
-      addEventListener(event => {
-        const expectedEvent = expectedEvents.pop()
-        expect(event).to.deep.equal(expectedEvent)
-        if (!expectedEvents.length) {
-          done()
-        }
+        it('updates the store', async () => {
+          await functions.auth.login('user_id')
+          expect(store.getState().auth).to.deep.equal({
+            user: 'user_id',
+            token: 'qwertyuiop'
+          })
+        })
+
+        it('returns no new state', async () => {
+          await functions.auth.pingServer()
+          expect(store.getState().auth).to.deep.equal({
+            user: '123',
+            token: 'abcdegf'
+          })
+        })
+
+        it('tracks an event for a function call with arguments', async () => {
+          const expectedEvents = [
+            {
+              type: 'update',
+              domain: 'auth',
+              state: { user: 'user_id', token: 'qwertyuiop' }
+            },
+            {
+              type: 'function-end',
+              domain: 'auth',
+              function: 'login',
+              args: ['user_id'],
+              nextState: { user: 'user_id', token: 'qwertyuiop' }
+            },
+            {
+              type: 'function-start',
+              domain: 'auth',
+              function: 'login',
+              args: ['user_id']
+            }
+          ]
+          return new Promise(async resolve => {
+            addEventListener(event => {
+              const expectedEvent = expectedEvents.pop()
+              expect(event).to.deep.equal(expectedEvent)
+              if (!expectedEvents.length) {
+                resolve()
+              }
+            })
+            await functions.auth.login('user_id')
+          })
+        })
       })
-      functions.auth.login('user_id')
     })
   })
-
-  describe('asynchronous functions', () => {})
 
   describe('edge cases', () => {
     describe('no functions provided', () => {
@@ -123,8 +153,8 @@ describe('ModelStore', () => {
         expect(store.getState().main.value).to.equal(2)
       })
 
-      it('set state from function', () => {
-        functions.main.create()
+      it('set state from function', async () => {
+        await functions.main.create()
         expect(store.getState().main.value).to.equal(1)
       })
     })
