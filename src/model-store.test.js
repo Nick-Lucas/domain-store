@@ -30,6 +30,15 @@ describe('ModelStore', () => {
     addEventListener = model.addEventListener
   }
 
+  const setupCustomModel = (key, domain) => {
+    const model = createModel({
+      [key]: domain
+    })
+    store = model.store
+    functions = model.functions
+    addEventListener = model.addEventListener
+  }
+
   describe('synchronous functions', () => {
     beforeEach(() => {
       setupModel()
@@ -76,4 +85,48 @@ describe('ModelStore', () => {
   })
 
   describe('asynchronous functions', () => {})
+
+  describe('edge cases', () => {
+    describe('no functions provided', () => {
+      beforeEach(() => {
+        setupCustomModel('main', createDomain({ value: 1 }))
+      })
+
+      it('gets state', () => {
+        expect(store.getState().main.value).to.equal(1)
+      })
+
+      it('sets state', () => {
+        store.setState({ main: { value: 2 } })
+        expect(store.getState().main.value).to.equal(2)
+      })
+
+      it('gets functions', () => {
+        expect(functions.main).to.deep.equal({})
+      })
+    })
+
+    describe('no state provided', () => {
+      beforeEach(() => {
+        setupCustomModel(
+          'main',
+          createDomain(null, store => ({ create: () => ({ value: 1 }) }))
+        )
+      })
+
+      it('gets state', () => {
+        expect(store.getState().main).to.deep.equal({})
+      })
+
+      it('sets state', () => {
+        store.setState({ main: { value: 2 } })
+        expect(store.getState().main.value).to.equal(2)
+      })
+
+      it('set state from function', () => {
+        functions.main.create()
+        expect(store.getState().main.value).to.equal(1)
+      })
+    })
+  })
 })

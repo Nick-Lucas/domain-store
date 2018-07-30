@@ -4,15 +4,15 @@ import EventsLog from './events-log'
 // takes an initial state for the domain
 // takes a function which given a store will return an object of functions
 export function createDomain(initialState, functionsCreator) {
-  if (typeof initialState !== 'object') {
+  if (initialState && typeof initialState !== 'object') {
     throw 'initialState must be an object'
   }
-  if (typeof functionsCreator !== 'function') {
+  if (functionsCreator && typeof functionsCreator !== 'function') {
     throw 'functionsCreator must be a function'
   }
   return {
-    initialState,
-    functionsCreator
+    initialState: initialState || {},
+    functionsCreator: functionsCreator || (store => ({}))
   }
 }
 
