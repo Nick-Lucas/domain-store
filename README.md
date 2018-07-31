@@ -41,9 +41,9 @@ const model = createModel({
     // Functions can get the current state for their domain and 
     // then return a new state, much like a reducer, but with support for side-effects.
     // Async/Promises are supported, and all functions become asyncronous
-    store => ({
+    (store, deps) => ({
       increment: async () => {
-        await doSomeAsyncWork()
+        await deps.doSomeAsyncWork()
         const { count } = store.getState()
         return { count: count + 1 }
       },
@@ -51,7 +51,15 @@ const model = createModel({
         const { count } = store.getState()
         return { count: count - 1 }
       },
-    }))
+    })),
+
+    // You might also want to inject dependencies into your functions scope.
+    // If you provide a dependencies object then you will simply be passed it 
+    // as a second argument in the functions creator.
+    // This is fantastic for decoupling your functions from 3rd party libraries which you want to easily mock
+    {
+      doSomeAsyncWork: async () =>  await Promise.resolve('ok')
+    }
 
 })
 
