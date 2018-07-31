@@ -1,5 +1,6 @@
 'use strict'
 
+import sinon from 'sinon'
 import { createModel, createDomain } from './model-store'
 
 describe('ModelStore', () => {
@@ -46,6 +47,27 @@ describe('ModelStore', () => {
   const setupCustomModel = (key, domain) => {
     const model = createModel({
       [key]: domain
+    })
+    store = model.store
+    functions = model.functions
+    addEventListener = model.addEventListener
+  }
+
+  const setupModelWithDeps = dependencies => {
+    const model = createModel({
+      auth: createDomain(
+        { user: '123', token: 'abcdegf' },
+        (store, deps) => ({
+          login: user => {
+            const { doSomeWork } = deps
+            return {
+              user,
+              token: doSomeWork(user)
+            }
+          }
+        }),
+        dependencies
+      )
     })
     store = model.store
     functions = model.functions
@@ -113,6 +135,18 @@ describe('ModelStore', () => {
           })
         })
       })
+    })
+  })
+
+  describe('function dependency injection', () => {
+    it('successfully calls the dependency', async () => {
+      const dependency = sinon.fake(() => 123)
+      setupModelWithDeps({
+        doSomeWork: dependency
+      })
+
+      await functions.auth.login('abc')
+      expect(dependency.calledWithExactly('abc')).to.be.true
     })
   })
 

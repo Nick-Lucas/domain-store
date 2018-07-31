@@ -3,16 +3,24 @@ import EventsLog from './events-log'
 // takes a domain id
 // takes an initial state for the domain
 // takes a function which given a store will return an object of functions
-export function createDomain(initialState, functionsCreator) {
+export function createDomain(
+  initialState,
+  functionsCreator,
+  dependencies = null
+) {
   if (initialState && typeof initialState !== 'object') {
     throw 'initialState must be an object'
   }
   if (functionsCreator && typeof functionsCreator !== 'function') {
     throw 'functionsCreator must be a function'
   }
+  if (dependencies && typeof dependencies !== 'object') {
+    throw 'dependencies must be an object if provided'
+  }
   return {
     initialState: initialState || {},
-    functionsCreator: functionsCreator || (store => ({}))
+    functionsCreator: functionsCreator || (() => ({})),
+    dependencies: dependencies || {}
   }
 }
 
@@ -58,8 +66,9 @@ const buildState = (domainKeys, domains) =>
 function buildFunctions(events, store, domainKeys, domains) {
   const domainFunctions = {}
   domainKeys.forEach(domainKey => {
+    const domain = domains[domainKey]
     const domainStore = createDomainStore(domainKey, store)
-    const functions = domains[domainKey].functionsCreator(domainStore)
+    const functions = domain.functionsCreator(domainStore, domain.dependencies)
 
     Object.keys(functions).map(funcKey => {
       const func = functions[funcKey]
