@@ -5,6 +5,14 @@
 
 An experimental Flux style store with native side-effects and a plain javascript API
 
+### Installation
+
+    yarn add domain-store
+    
+    or
+    
+    npm install --save domain-store
+
 ### Thought Process
 
 **redux** is great but it has many problems:
