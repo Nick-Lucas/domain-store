@@ -32,9 +32,8 @@ An experimental Flux style store with native side-effects and a plain javascript
 import { createModel, createDomain } from "domain-store"
 
 // a model is the root store
+// it has many domains, provided as an object
 const model = createModel({
-
-  // A model has many domains, provided as an object
   counter: createDomain(
     
     // initial state for the domain
@@ -54,16 +53,17 @@ const model = createModel({
         const { count } = store.getState()
         return { count: count - 1 }
       },
-    })),
+    }),
 
-    // You might also want to inject dependencies into your functions scope.
-    // If you provide a dependencies object then you will simply be passed it 
-    // as a second argument in the functions creator.
-    // This is fantastic for decoupling your functions from 3rd party libraries which you want to easily mock
+    // You might also want to inject dependencies into your functions.
+    // If you provide a dependencies object then you will simply be  
+    // passed it as a second argument in the functions creator.
+    // This is fantastic for decoupling your functions from 3rd party 
+    // libraries which you want to easily mock, and saves the need for stubbing
     {
       doSomeAsyncWork: async () =>  await Promise.resolve('ok')
     }
-
+  )
 })
 
 // model now contains:
