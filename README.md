@@ -1,3 +1,6 @@
+
+[![npm](https://img.shields.io/npm/v/domain-store.svg)](https://www.npmjs.com/package/domain-store)
+
 # domain-store
 
 An experimental Flux style store with native side-effects and a plain javascript API
