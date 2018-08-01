@@ -1,3 +1,3 @@
-import { createDomain, createModel } from './model-store'
+import { createDomain, createModel } from './domain-store'
 
 export default { createDomain, createModel }

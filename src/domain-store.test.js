@@ -1,7 +1,7 @@
 'use strict'
 
 import sinon from 'sinon'
-import { createModel, createDomain } from './model-store'
+import { createModel, createDomain } from './domain-store'
 
 describe('ModelStore', () => {
   let store, functions, addEventListener
