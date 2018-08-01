@@ -1,4 +1,4 @@
-# model-store.js
+# model-store
 
 An experimental Flux style store with native side-effects and a plain javascript API
 
